@@ -3,128 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sangue e Lacrime Studio</title>
+    <title>Sangue e Lacrime | Studio Booking</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --sage: #a3b18a; --cream: #f4f1ea; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--cream); color: #2d3436; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--cream); color: #2d3436; overflow-x: hidden; }
         .serif { font-family: 'Playfair Display', serif; }
-        .card-shadow { box-shadow: 0 20px 50px rgba(0,0,0,0.06); }
+        .step { display: none; }
+        .step.active { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        .progress-bar { transition: width 0.4s ease; background-color: var(--sage); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center py-10 px-4">
 
-    <div class="max-w-md w-full bg-white rounded-[2.5rem] card-shadow overflow-hidden">
-        <div class="bg-[#a3b18a] p-10 text-white text-center">
-            <h1 class="serif text-3xl tracking-widest uppercase">Sangue e Lacrime</h1>
-            <p class="text-[10px] uppercase tracking-[0.3em] mt-2 opacity-80 font-light">Fine Line & Botanical Art</p>
+    <div class="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden min-h-[600px] flex flex-col">
+        <div class="w-full h-1.5 bg-stone-100"><div id="progress" class="progress-bar h-full w-1/4"></div></div>
+
+        <div class="bg-[#a3b18a] p-8 text-white text-center">
+            <h1 class="serif text-2xl tracking-widest uppercase">Sangue e Lacrime</h1>
+            <p id="stepTitle" class="text-[9px] uppercase tracking-[0.2em] mt-1 opacity-80 font-semibold">Passo 1: Servizio</p>
         </div>
 
-        <div class="p-8 space-y-5">
-            <form id="tattooForm" class="space-y-4">
-                <div class="flex p-1 bg-stone-100 rounded-2xl">
-                    <button type="button" id="btnPrev" onclick="selectType('Preventivo')" class="flex-1 py-3 text-[10px] font-bold uppercase rounded-xl bg-white shadow-sm transition-all border border-transparent">🪵 Preventivo</button>
-                    <button type="button" id="btnBook" onclick="selectType('Prenotazione')" class="flex-1 py-3 text-[10px] font-bold uppercase rounded-xl transition-all border border-transparent">📅 Prenotazione</button>
+        <form id="tattooForm" class="p-8 flex-grow flex flex-col justify-between">
+            
+            <div class="step active" id="step1">
+                <label class="text-[10px] uppercase font-bold text-stone-400 mb-4 block tracking-widest">Cosa desideri fare?</label>
+                <div class="flex p-1 bg-stone-100 rounded-2xl mb-6">
+                    <button type="button" onclick="setService('Preventivo', this)" class="service-btn flex-1 py-3 text-[10px] font-bold uppercase rounded-xl bg-white shadow-sm transition-all">🪵 Preventivo</button>
+                    <button type="button" onclick="setService('Prenotazione', this)" class="service-btn flex-1 py-3 text-[10px] font-bold uppercase rounded-xl transition-all">📅 Prenota</button>
                     <input type="hidden" id="tipoServizio" value="Preventivo">
                 </div>
+                <label class="text-[10px] uppercase font-bold text-stone-400 mb-2 block tracking-widest">Scegli lo Stile</label>
+                <select id="stile" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm appearance-none cursor-pointer">
+                    <option value="Botanico / Fine-line">🌿 Botanico / Fine-line</option>
+                    <option value="Minimalista">✨ Minimalista</option>
+                    <option value="Tradizionale">⚓ Tradizionale</option>
+                    <option value="Blackwork / Dark">🖤 Blackwork / Dark</option>
+                    <option value="Lettering">✍️ Lettering</option>
+                </select>
+            </div>
 
-                <div class="space-y-3">
-                    <input type="text" id="nome" placeholder="Nome e Cognome" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]">
-                    <input type="text" id="ig" placeholder="Profilo Instagram" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]">
-                    <textarea id="idea" placeholder="Descrivi l'idea..." rows="2" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]"></textarea>
-                    
-                    <div class="relative">
-                        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-stone-200 rounded-xl cursor-pointer bg-stone-50 hover:bg-stone-100 transition-all">
-                            <div class="flex flex-col items-center justify-center text-stone-400 text-center px-2" id="statusTesto">
-                                <p class="text-[10px] uppercase font-bold tracking-widest" id="testoUpload">Allega Foto Reference</p>
-                            </div>
-                            <input id="fotoInput" type="file" accept="image/*" class="hidden" onchange="uploadToCloudinary(this)" />
-                        </label>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 text-xs">
-                        <input type="text" id="pos" placeholder="Zona corpo" class="p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none">
-                        <input type="text" id="mis" placeholder="Misure (cm)" class="p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none">
-                    </div>
+            <div class="step" id="step2">
+                <label class="text-[10px] uppercase font-bold text-stone-400 mb-2 block tracking-widest">Dettagli Tatuaggio</label>
+                <textarea id="idea" placeholder="Soggetto e dettagli..." rows="2" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm mb-3"></textarea>
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <input type="text" id="pos" placeholder="Zona corpo" class="p-4 bg-stone-50 border border-stone-100 rounded-xl text-sm">
+                    <input type="text" id="mis" placeholder="Misure cm" class="p-4 bg-stone-50 border border-stone-100 rounded-xl text-sm">
                 </div>
+                <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-stone-200 rounded-xl cursor-pointer bg-stone-50 hover:bg-stone-100 transition-all">
+                    <span id="fotoStatus" class="text-[10px] uppercase font-bold text-stone-400 text-center px-2 text-center">📎 Allega Reference</span>
+                    <input id="fotoInput" type="file" accept="image/*" class="hidden" onchange="uploadToCloudinary(this)" />
+                </label>
+            </div>
 
-                <button type="submit" id="btnInvia" class="w-full py-5 bg-[#a3b18a] text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg hover:brightness-95 transition-all">
-                    Invia su WhatsApp 🌿
-                </button>
-            </form>
-        </div>
+            <div class="step" id="step3">
+                <label class="text-[10px] uppercase font-bold text-stone-400 mb-3 block tracking-widest">⚠️ Salute & Sicurezza</label>
+                <div class="space-y-3 bg-stone-50 p-4 rounded-xl border border-stone-100 text-[11px]">
+                    <div class="flex items-start gap-2"><input type="checkbox" id="c1" class="mt-1"><label for="c1">Niente alcol/droghe nelle ultime 24h</label></div>
+                    <div class="flex items-start gap-2"><input type="checkbox" id="c2" class="mt-1"><label for="c2">Nessuna gravidanza/allattamento</label></div>
+                    <div class="flex items-start gap-2"><input type="checkbox" id="c3" class="mt-1"><label for="c3">Nessuna allergia grave/patologia pelle</label></div>
+                    <div class="flex items-start gap-2"><input type="checkbox" id="c4" class="mt-1"><label for="c4">Sono maggiorenne (+18)</label></div>
+                </div>
+            </div>
+
+            <div class="step" id="step4">
+                <input type="text" id="nome" placeholder="Nome e Cognome" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl text-sm mb-3">
+                <input type="text" id="ig" placeholder="Profilo Instagram" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl text-sm mb-3">
+                <input type="text" id="date" placeholder="Disponibilità (giorni/orari)" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl text-sm">
+            </div>
+
+            <div class="mt-8 flex gap-3">
+                <button type="button" id="prevBtn" onclick="changeStep(-1)" class="hidden flex-1 py-4 border border-stone-200 rounded-2xl text-[10px] font-bold uppercase tracking-widest transition-all">Indietro</button>
+                <button type="button" id="nextBtn" onclick="changeStep(1)" class="flex-[2] py-4 bg-[#a3b18a] text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest shadow-lg">Avanti</button>
+            </div>
+        </form>
     </div>
 
     <script>
-        let imageUrl = ""; 
-        const CLOUD_NAME = "dmzxzjy3b"; // <-- SOSTITUISCI
-        const UPLOAD_PRESET = "qwonr5tg";   // <-- SOSTITUISCI (deve essere 'unsigned')
+        let currentStep = 1;
+        const totalSteps = 4;
+        let imageUrl = "Nessuna foto";
 
-        function selectType(val) {
+        // --- CONFIGURA QUI ---
+        const CLOUD_NAME = "dmzxzjy3b";
+        const UPLOAD_PRESET = "qwonr5tg";
+        const MIO_NUMERO = "3474184010";
+        // ----------------------
+
+        function setService(val, btn) {
             document.getElementById('tipoServizio').value = val;
-            const isPrev = val === 'Preventivo';
-            document.getElementById('btnPrev').classList.toggle('bg-white', isPrev);
-            document.getElementById('btnPrev').classList.toggle('shadow-sm', isPrev);
-            document.getElementById('btnBook').classList.toggle('bg-white', !isPrev);
-            document.getElementById('btnBook').classList.toggle('shadow-sm', !isPrev);
+            document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('bg-white', 'shadow-sm'));
+            btn.classList.add('bg-white', 'shadow-sm');
         }
 
         async function uploadToCloudinary(input) {
             if (!input.files || !input.files[0]) return;
-            
-            const file = input.files[0];
-            const testoElem = document.getElementById('testoUpload');
-            testoElem.innerText = "CARICAMENTO... ⏳";
+            const status = document.getElementById('fotoStatus');
+            status.innerText = "CARICAMENTO... ⏳";
             
             const formData = new FormData();
-            formData.append("file", file);
+            formData.append("file", input.files[0]);
             formData.append("upload_preset", UPLOAD_PRESET);
 
             try {
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
-                    method: "POST",
-                    body: formData
-                });
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method: "POST", body: formData });
                 const data = await res.json();
                 if (data.secure_url) {
                     imageUrl = data.secure_url;
-                    testoElem.innerText = "✅ FOTO CARICATA!";
-                    testoElem.style.color = "#a3b18a";
+                    status.innerText = "✅ FOTO CARICATA CORRETTAMENTE";
+                    status.style.color = "#a3b18a";
                 }
-            } catch (err) {
-                testoElem.innerText = "❌ ERRORE. RIPROVA.";
-                console.error(err);
-            }
+            } catch (err) { status.innerText = "❌ ERRORE CARICAMENTO"; }
         }
 
-        document.getElementById('tattooForm').onsubmit = function(e) {
-            e.preventDefault();
-            
-            const mioNumero = "393474184010"; // <-- METTI IL TUO NUMERO (es. 393471234567)
+        function changeStep(n) {
+            if (n === 1 && currentStep === 3) {
+                if (!document.getElementById('c1').checked || !document.getElementById('c2').checked || !document.getElementById('c3').checked || !document.getElementById('c4').checked) {
+                    alert("⚠️ Conferma tutti i requisiti di salute per proseguire."); return;
+                }
+            }
+            if (n === 1 && currentStep === 4) { sendWhatsApp(); return; }
 
-            const d = {
-                tipo: document.getElementById('tipoServizio').value,
-                nome: document.getElementById('nome').value,
-                ig: document.getElementById('ig').value,
-                idea: document.getElementById('idea').value,
-                zona: document.getElementById('pos').value,
-                misura: document.getElementById('mis').value,
-                foto: imageUrl ? imageUrl : "Nessuna foto"
-            };
+            document.querySelectorAll('.step')[currentStep-1].classList.remove('active');
+            currentStep += n;
+            document.querySelectorAll('.step')[currentStep-1].classList.add('active');
+            updateUI();
+        }
 
-            const msg = `🌿 *SANGUE E LACRIME*%0A` +
+        function updateUI() {
+            document.getElementById('progress').style.width = (currentStep / totalSteps * 100) + "%";
+            document.getElementById('prevBtn').classList.toggle('hidden', currentStep === 1);
+            document.getElementById('nextBtn').innerText = currentStep === totalSteps ? "INVIA A LUIGI 🌿" : "AVANTI";
+            const titles = ["Servizio", "Progetto", "Salute", "Contatti"];
+            document.getElementById('stepTitle').innerText = `Passo ${currentStep}: ${titles[currentStep-1]}`;
+        }
+
+        function sendWhatsApp() {
+            const msg = `🌿 *SANGUE E LACRIME | BOOKING*%0A` +
                         `--------------------------%0A` +
-                        `🔥 *Servizio:* ${d.tipo}%0A` +
-                        `👤 *Cliente:* ${d.nome}%0A` +
-                        `📸 *IG:* ${d.ig}%0A` +
-                        `🎨 *Idea:* ${d.idea}%0A` +
-                        `📍 *Zona:* ${d.zona} (${d.misura})%0A` +
-                        `🖼️ *Reference:* ${d.foto}%0A` +
-                        `--------------------------`;
-
-            window.location.href = `https://api.whatsapp.com/send?phone=${mioNumero}&text=${msg}`;
-        };
+                        `🔥 *Richiesta:* ${document.getElementById('tipoServizio').value}%0A` +
+                        `🎨 *Stile:* ${document.getElementById('stile').value}%0A` +
+                        `📝 *Idea:* ${document.getElementById('idea').value}%0A` +
+                        `📍 *Zona:* ${document.getElementById('pos').value} (${document.getElementById('mis').value})%0A` +
+                        `🖼️ *Reference:* ${imageUrl}%0A` +
+                        `👤 *Cliente:* ${document.getElementById('nome').value}%0A` +
+                        `📸 *IG:* ${document.getElementById('ig').value}%0A` +
+                        `📅 *Dispo:* ${document.getElementById('date').value}`;
+            window.location.href = `https://api.whatsapp.com/send?phone=${MIO_NUMERO}&text=${msg}`;
+        }
     </script>
 </body>
 </html>
