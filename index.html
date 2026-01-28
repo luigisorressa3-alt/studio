@@ -1,54 +1,130 @@
-<script>
-    let imageUrl = ""; // Qui salveremo il link della foto caricata
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sangue e Lacrime Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --sage: #a3b18a; --cream: #f4f1ea; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--cream); color: #2d3436; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .card-shadow { box-shadow: 0 20px 50px rgba(0,0,0,0.06); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center py-10 px-4">
 
-    async function uploadImage(file) {
-        const cloudName = "dmzxzjy3b"; // <--- METTI IL TUO CLOUD NAME
-        const uploadPreset = "qwonr5tg";   // <--- METTI IL TUO PRESET (UNSIGNED)
-        
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", uploadPreset);
+    <div class="max-w-md w-full bg-white rounded-[2.5rem] card-shadow overflow-hidden">
+        <div class="bg-[#a3b18a] p-10 text-white text-center">
+            <h1 class="serif text-3xl tracking-widest uppercase">Sangue e Lacrime</h1>
+            <p class="text-[10px] uppercase tracking-[0.3em] mt-2 opacity-80 font-light">Fine Line & Botanical Art</p>
+        </div>
 
-        document.getElementById('uploadText').innerText = "Caricamento in corso...";
+        <div class="p-8 space-y-5">
+            <form id="tattooForm" class="space-y-4">
+                <div class="flex p-1 bg-stone-100 rounded-2xl">
+                    <button type="button" id="btnPrev" onclick="selectType('Preventivo')" class="flex-1 py-3 text-[10px] font-bold uppercase rounded-xl bg-white shadow-sm transition-all border border-transparent">🪵 Preventivo</button>
+                    <button type="button" id="btnBook" onclick="selectType('Prenotazione')" class="flex-1 py-3 text-[10px] font-bold uppercase rounded-xl transition-all border border-transparent">📅 Prenotazione</button>
+                    <input type="hidden" id="tipoServizio" value="Preventivo">
+                </div>
 
-        try {
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-                method: "POST",
-                body: formData
-            });
-            const data = await res.json();
-            imageUrl = data.secure_url;
-            document.getElementById('uploadText').innerText = "✅ Foto Caricata!";
-        } catch (err) {
-            alert("Errore nel caricamento foto. Riprova.");
-            document.getElementById('uploadText').innerText = "Errore. Riprova.";
+                <div class="space-y-3">
+                    <input type="text" id="nome" placeholder="Nome e Cognome" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]">
+                    <input type="text" id="ig" placeholder="Profilo Instagram" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]">
+                    <textarea id="idea" placeholder="Descrivi l'idea..." rows="2" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]"></textarea>
+                    
+                    <div class="relative">
+                        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-stone-200 rounded-xl cursor-pointer bg-stone-50 hover:bg-stone-100 transition-all">
+                            <div class="flex flex-col items-center justify-center text-stone-400 text-center px-2" id="statusTesto">
+                                <p class="text-[10px] uppercase font-bold tracking-widest" id="testoUpload">Allega Foto Reference</p>
+                            </div>
+                            <input id="fotoInput" type="file" accept="image/*" class="hidden" onchange="uploadToCloudinary(this)" />
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <input type="text" id="pos" placeholder="Zona corpo" class="p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none">
+                        <input type="text" id="mis" placeholder="Misure (cm)" class="p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none">
+                    </div>
+                </div>
+
+                <button type="submit" id="btnInvia" class="w-full py-5 bg-[#a3b18a] text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg hover:brightness-95 transition-all">
+                    Invia su WhatsApp 🌿
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let imageUrl = ""; 
+        const CLOUD_NAME = "dmzxzjy3b"; // <-- SOSTITUISCI
+        const UPLOAD_PRESET = "qwonr5tg";   // <-- SOSTITUISCI (deve essere 'unsigned')
+
+        function selectType(val) {
+            document.getElementById('tipoServizio').value = val;
+            const isPrev = val === 'Preventivo';
+            document.getElementById('btnPrev').classList.toggle('bg-white', isPrev);
+            document.getElementById('btnPrev').classList.toggle('shadow-sm', isPrev);
+            document.getElementById('btnBook').classList.toggle('bg-white', !isPrev);
+            document.getElementById('btnBook').classList.toggle('shadow-sm', !isPrev);
         }
-    }
 
-    function updateFileName(input) {
-        if (input.files && input.files[0]) {
-            uploadImage(input.files[0]);
+        async function uploadToCloudinary(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            const testoElem = document.getElementById('testoUpload');
+            testoElem.innerText = "CARICAMENTO... ⏳";
+            
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("upload_preset", UPLOAD_PRESET);
+
+            try {
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.secure_url) {
+                    imageUrl = data.secure_url;
+                    testoElem.innerText = "✅ FOTO CARICATA!";
+                    testoElem.style.color = "#a3b18a";
+                }
+            } catch (err) {
+                testoElem.innerText = "❌ ERRORE. RIPROVA.";
+                console.error(err);
+            }
         }
-    }
 
-    document.getElementById('tattooForm').onsubmit = function(e) {
-        e.preventDefault();
-        
-        const numeroTatuatore = "393474184010"; // <--- IL TUO NUMERO
+        document.getElementById('tattooForm').onsubmit = function(e) {
+            e.preventDefault();
+            
+            const mioNumero = "393474184010"; // <-- METTI IL TUO NUMERO (es. 393471234567)
 
-        const tipo = document.getElementById('tipoServizio').value;
-        const nome = document.getElementById('nome').value;
-        const idea = document.getElementById('idea').value;
-        const fotoLink = imageUrl ? imageUrl : "Nessuna foto caricata";
+            const d = {
+                tipo: document.getElementById('tipoServizio').value,
+                nome: document.getElementById('nome').value,
+                ig: document.getElementById('ig').value,
+                idea: document.getElementById('idea').value,
+                zona: document.getElementById('pos').value,
+                misura: document.getElementById('mis').value,
+                foto: imageUrl ? imageUrl : "Nessuna foto"
+            };
 
-        const testo = `🌿 *SANGUE E LACRIME STUDIO*%0A` +
-                      `------------------------------%0A` +
-                      `🔥 *Tipo:* ${tipo}%0A` +
-                      `👤 *Cliente:* ${nome}%0A` +
-                      `🎨 *Idea:* ${idea}%0A` +
-                      `🖼️ *Foto:* ${fotoLink}%0A` +
-                      `------------------------------`;
+            const msg = `🌿 *SANGUE E LACRIME*%0A` +
+                        `--------------------------%0A` +
+                        `🔥 *Servizio:* ${d.tipo}%0A` +
+                        `👤 *Cliente:* ${d.nome}%0A` +
+                        `📸 *IG:* ${d.ig}%0A` +
+                        `🎨 *Idea:* ${d.idea}%0A` +
+                        `📍 *Zona:* ${d.zona} (${d.misura})%0A` +
+                        `🖼️ *Reference:* ${d.foto}%0A` +
+                        `--------------------------`;
 
-        window.location.href = `https://api.whatsapp.com/send?phone=${numeroTatuatore}&text=${testo}`;
-    };
-</script>
+            window.location.href = `https://api.whatsapp.com/send?phone=${mioNumero}&text=${msg}`;
+        };
+    </script>
+</body>
+</html>
