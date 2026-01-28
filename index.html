@@ -5,50 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sangue e Lacrime Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #fdfcfb;
-            color: #1a1a1a;
-            -webkit-font-smoothing: antialiased;
-        }
-        .serif {
-            font-family: 'Playfair Display', serif;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d1d1d1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #bdbdbd;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.6s ease-out forwards;
-        }
+        body { background-color: #f4f1ea; color: #2d3436; font-family: serif; }
+        .wood-btn { background-color: #eaddca; border: 2px solid #d4c4ad; }
+        .sage-bg { background-color: #a3b18a; }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/"
-  }
-}
-</script>
 </head>
-<body>
-    <div id="root"></div>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-stone-200">
+        <div class="sage-bg p-8 text-white text-center">
+            <h1 class="text-3xl font-bold tracking-widest">SANGUE E LACRIME</h1>
+            <p class="text-sm italic opacity-80 mt-2">Studio Tatuaggi Botanico</p>
+        </div>
+
+        <div class="p-6 space-y-6">
+            <div class="text-center text-xs text-stone-500 uppercase tracking-widest">Seleziona un'opzione</div>
+            
+            <form id="tattooForm" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <button type="button" onclick="document.getElementById('servizio').value='Preventivo'" class="wood-btn p-4 rounded-xl text-xs font-bold hover:bg-stone-200 transition">🪵 PREVENTIVO</button>
+                    <button type="button" onclick="document.getElementById('servizio').value='Prenotazione'" class="wood-btn p-4 rounded-xl text-xs font-bold hover:bg-stone-200 transition">📅 PRENOTAZIONE</button>
+                </div>
+
+                <input type="hidden" id="servizio" value="Non specificato">
+                <input type="text" id="nome" placeholder="Il tuo Nome" required class="w-full p-3 bg-stone-50 border rounded-lg outline-none focus:border-green-600">
+                <input type="text" id="idea" placeholder="Cosa vorresti farti?" required class="w-full p-3 bg-stone-50 border rounded-lg outline-none focus:border-green-600">
+                <input type="text" id="zona" placeholder="Zona del corpo e grandezza" class="w-full p-3 bg-stone-50 border rounded-lg outline-none">
+
+                <button type="submit" class="w-full sage-bg text-white font-bold py-4 rounded-xl shadow-lg hover:brightness-90 transition">
+                    INVIA SU WHATSAPP 🌿
+                </button>
+            </form>
+            <p class="text-[10px] text-center text-stone-400 italic">La sessione sarà confermata manualmente dall'artista.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('tattooForm').onsubmit = function(e) {
+            e.preventDefault();
+            const phone = "393331234567"; // <--- METTI IL TUO NUMERO QUI
+            const s = document.getElementById('servizio').value;
+            const n = document.getElementById('nome').value;
+            const i = document.getElementById('idea').value;
+            const z = document.getElementById('zona').value;
+
+            const msg = `🌿 *SANGUE E LACRIME*%0A*Richiesta:* ${s}%0A*Nome:* ${n}%0A*Idea:* ${i}%0A*Zona:* ${z}`;
+            window.location.href = `https://api.whatsapp.com/send?phone=${phone}&text=${msg}`;
+        };
+    </script>
 </body>
 </html>
