@@ -3,117 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sangue e Lacrime Studio | Booking</title>
+    <title>Sangue e Lacrime Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --sage: #a3b18a; --cream: #f4f1ea; --wood: #d4c4ad; }
+        :root { --sage: #a3b18a; --cream: #f4f1ea; }
         body { font-family: 'Inter', sans-serif; background-color: var(--cream); color: #2d3436; }
         .serif { font-family: 'Playfair Display', serif; }
-        .card-shadow { box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
-        .input-focus:focus { border-color: var(--sage); ring: 2px solid var(--sage); }
-        
-        /* Animazione ingresso */
-        .fade-up { animation: fadeUp 0.8s ease-out; }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .card-shadow { box-shadow: 0 20px 50px rgba(0,0,0,0.06); }
+        .fade-in { animation: fadeIn 0.8s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center py-12 px-4">
+<body class="min-h-screen flex items-center justify-center py-10 px-4">
 
-    <div class="max-w-md w-full bg-white rounded-[3rem] card-shadow overflow-hidden fade-up">
-        <div class="bg-[#a3b18a] p-12 text-white text-center relative overflow-hidden">
-            <div class="relative z-10">
-                <h1 class="serif text-3xl tracking-[0.2em] uppercase mb-2">Sangue e Lacrime</h1>
-                <div class="h-[1px] w-20 bg-white/40 mx-auto mb-3"></div>
-                <p class="text-[10px] uppercase tracking-[0.4em] font-light">Fine Line & Botanical Art</p>
-            </div>
-            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+    <div class="max-w-md w-full bg-white rounded-[2.5rem] card-shadow overflow-hidden fade-in">
+        <div class="bg-[#a3b18a] p-10 text-white text-center">
+            <h1 class="serif text-3xl tracking-widest uppercase">Sangue e Lacrime</h1>
+            <p class="text-[10px] uppercase tracking-[0.3em] mt-2 opacity-80 font-light">Fine Line & Botanical Art</p>
         </div>
 
-        <div class="p-8 md:p-10 space-y-8">
-            <form id="mainForm" class="space-y-6">
+        <div class="p-8 space-y-5">
+            <form id="tattooForm" class="space-y-4">
                 
                 <div class="flex p-1 bg-stone-100 rounded-2xl">
-                    <button type="button" onclick="selectType('Preventivo', this)" class="type-btn flex-1 py-3 text-[10px] font-bold uppercase tracking-wider rounded-xl bg-white shadow-sm transition-all border border-transparent">🪵 Preventivo</button>
-                    <button type="button" onclick="selectType('Prenotazione', this)" class="type-btn flex-1 py-3 text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all border border-transparent">📅 Prenotazione</button>
+                    <button type="button" id="btnPrev" onclick="selectType('Preventivo')" class="flex-1 py-3 text-[10px] font-bold uppercase rounded-xl bg-white shadow-sm transition-all border border-transparent">🪵 Preventivo</button>
+                    <button type="button" id="btnBook" onclick="selectType('Prenotazione')" class="flex-1 py-3 text-[10px] font-bold uppercase rounded-xl transition-all border border-transparent">📅 Prenotazione</button>
                     <input type="hidden" id="tipoServizio" value="Preventivo">
                 </div>
 
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-[10px] uppercase tracking-widest font-bold text-stone-400 ml-2 mb-1 block">Dati Personali</label>
-                        <input type="text" id="nome" placeholder="Nome e Cognome" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-2xl outline-none input-focus text-sm">
-                    </div>
+                <div class="space-y-3">
+                    <input type="text" id="nome" placeholder="Nome e Cognome" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]">
+                    <input type="text" id="ig" placeholder="Profilo Instagram (@...)" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]">
+                    <textarea id="idea" placeholder="Descrivi la tua idea..." rows="2" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]"></textarea>
                     
-                    <input type="text" id="ig" placeholder="Profilo Instagram (@...)" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-2xl outline-none input-focus text-sm">
-
-                    <div>
-                        <label class="text-[10px] uppercase tracking-widest font-bold text-stone-400 ml-2 mb-1 block">Il Progetto</label>
-                        <textarea id="idea" placeholder="Cosa vorresti realizzare?" rows="3" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-2xl outline-none input-focus text-sm"></textarea>
+                    <div class="relative group">
+                        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-stone-200 rounded-xl cursor-pointer bg-stone-50 hover:bg-stone-100 transition-all">
+                            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-stone-400" id="uploadText">
+                                <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                <p class="text-[10px] uppercase font-bold tracking-widest">Allega Foto Reference</p>
+                            </div>
+                            <input id="foto" type="file" accept="image/*" class="hidden" onchange="updateFileName(this)" />
+                        </label>
+                        <p id="fileName" class="text-[10px] text-center text-sage-600 mt-2 font-bold"></p>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <input type="text" id="posizione" placeholder="Zona (es. Braccio)" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-2xl outline-none text-sm">
-                        <input type="text" id="misure" placeholder="Misure (cm)" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-2xl outline-none text-sm">
-                    </div>
-
-                    <div>
-                        <label class="text-[10px] uppercase tracking-widest font-bold text-stone-400 ml-2 mb-1 block">Quando?</label>
-                        <input type="text" id="dispo" placeholder="Preferenze giorni/orari" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-2xl outline-none text-sm">
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <input type="text" id="pos" placeholder="Zona corpo" class="p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none focus:border-[#a3b18a]">
+                        <input type="text" id="mis" placeholder="Misure (cm)" class="p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none focus:border-[#a3b18a]">
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-5 bg-[#a3b18a] text-white rounded-[1.5rem] font-bold text-xs uppercase tracking-[0.2em] shadow-lg shadow-sage/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                    Invia Richiesta su WhatsApp
+                <button type="submit" class="w-full py-5 bg-[#a3b18a] text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg hover:brightness-95 transition-all active:scale-[0.98]">
+                    Invia Richiesta su WhatsApp 🌿
                 </button>
-                
-                <p class="text-[10px] text-center text-stone-400 italic px-6">
-                    "Il tatuaggio è una cicatrice scelta, un segno nel tempo."
-                </p>
             </form>
         </div>
     </div>
 
     <script>
-        // Gestione Selezione Tipo
-        function selectType(val, btn) {
+        function selectType(val) {
             document.getElementById('tipoServizio').value = val;
-            document.querySelectorAll('.type-btn').forEach(b => {
-                b.classList.remove('bg-white', 'shadow-sm');
-                b.style.borderColor = 'transparent';
-            });
-            btn.classList.add('bg-white', 'shadow-sm');
+            const isPrev = val === 'Preventivo';
+            document.getElementById('btnPrev').classList.toggle('bg-white', isPrev);
+            document.getElementById('btnPrev').classList.toggle('shadow-sm', isPrev);
+            document.getElementById('btnBook').classList.toggle('bg-white', !isPrev);
+            document.getElementById('btnBook').classList.toggle('shadow-sm', !isPrev);
         }
 
-        // Gestione Invio
-        document.getElementById('mainForm').onsubmit = function(e) {
+        function updateFileName(input) {
+            const name = input.files[0] ? `✓ Immagine selezionata: ${input.files[0].name}` : "";
+            document.getElementById('fileName').innerText = name;
+        }
+
+        document.getElementById('tattooForm').onsubmit = function(e) {
             e.preventDefault();
             
-            const numeroTatuatore = "393331234567"; // <--- METTI IL TUO NUMERO QUI
+            const numeroTatuatore = "393331234567"; // <--- CAMBIA CON IL TUO
 
-            const dati = {
-                tipo: document.getElementById('tipoServizio').value,
-                nome: document.getElementById('nome').value,
-                ig: document.getElementById('ig').value,
-                idea: document.getElementById('idea').value,
-                pos: document.getElementById('posizione').value,
-                mis: document.getElementById('misure').value,
-                quando: document.getElementById('dispo').value
-            };
+            const tipo = document.getElementById('tipoServizio').value;
+            const nome = document.getElementById('nome').value;
+            const ig = document.getElementById('ig').value;
+            const idea = document.getElementById('idea').value;
+            const zona = document.getElementById('pos').value;
+            const misura = document.getElementById('mis').value;
+            const hasFoto = document.getElementById('foto').files[0] ? "ALLEGATA (Inviala ora dalla galleria)" : "Non allegata";
 
             const testo = `🌿 *SANGUE E LACRIME STUDIO*%0A` +
                           `------------------------------%0A` +
-                          `🔥 *Richiesta:* ${dati.tipo}%0A` +
-                          `👤 *Cliente:* ${dati.nome}%0A` +
-                          `📸 *IG:* ${dati.ig}%0A` +
-                          `🎨 *Progetto:* ${dati.idea}%0A` +
-                          `📍 *Zona:* ${dati.pos} (${dati.mis})%0A` +
-                          `📅 *Disponibilità:* ${dati.quando}%0A` +
+                          `🔥 *Tipo:* ${tipo}%0A` +
+                          `👤 *Cliente:* ${nome}%0A` +
+                          `📸 *IG:* ${ig}%0A` +
+                          `🎨 *Idea:* ${idea}%0A` +
+                          `📍 *Zona:* ${zona} (${misura})%0A` +
+                          `🖼️ *Foto:* ${hasFoto}%0A` +
                           `------------------------------%0A` +
-                          `_Attendo conferma dell'artista._`;
+                          `_Invio ora la foto dalla mia galleria..._`;
 
             window.location.href = `https://api.whatsapp.com/send?phone=${numeroTatuatore}&text=${testo}`;
         };
