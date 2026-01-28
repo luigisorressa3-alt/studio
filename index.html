@@ -1,107 +1,54 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sangue e Lacrime Studio</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --sage: #a3b18a; --cream: #f4f1ea; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--cream); color: #2d3436; }
-        .serif { font-family: 'Playfair Display', serif; }
-        .card-shadow { box-shadow: 0 20px 50px rgba(0,0,0,0.06); }
-        .fade-in { animation: fadeIn 0.8s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
-</head>
-<body class="min-h-screen flex items-center justify-center py-10 px-4">
+<script>
+    let imageUrl = ""; // Qui salveremo il link della foto caricata
 
-    <div class="max-w-md w-full bg-white rounded-[2.5rem] card-shadow overflow-hidden fade-in">
-        <div class="bg-[#a3b18a] p-10 text-white text-center">
-            <h1 class="serif text-3xl tracking-widest uppercase">Sangue e Lacrime</h1>
-            <p class="text-[10px] uppercase tracking-[0.3em] mt-2 opacity-80 font-light">Fine Line & Botanical Art</p>
-        </div>
+    async function uploadImage(file) {
+        const cloudName = "dmzxzjy3b"; // <--- METTI IL TUO CLOUD NAME
+        const uploadPreset = "qwonr5tg";   // <--- METTI IL TUO PRESET (UNSIGNED)
+        
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", uploadPreset);
 
-        <div class="p-8 space-y-5">
-            <form id="tattooForm" class="space-y-4">
-                
-                <div class="flex p-1 bg-stone-100 rounded-2xl">
-                    <button type="button" id="btnPrev" onclick="selectType('Preventivo')" class="flex-1 py-3 text-[10px] font-bold uppercase rounded-xl bg-white shadow-sm transition-all border border-transparent">🪵 Preventivo</button>
-                    <button type="button" id="btnBook" onclick="selectType('Prenotazione')" class="flex-1 py-3 text-[10px] font-bold uppercase rounded-xl transition-all border border-transparent">📅 Prenotazione</button>
-                    <input type="hidden" id="tipoServizio" value="Preventivo">
-                </div>
+        document.getElementById('uploadText').innerText = "Caricamento in corso...";
 
-                <div class="space-y-3">
-                    <input type="text" id="nome" placeholder="Nome e Cognome" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]">
-                    <input type="text" id="ig" placeholder="Profilo Instagram (@...)" class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]">
-                    <textarea id="idea" placeholder="Descrivi la tua idea..." rows="2" required class="w-full p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none text-sm focus:border-[#a3b18a]"></textarea>
-                    
-                    <div class="relative group">
-                        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-stone-200 rounded-xl cursor-pointer bg-stone-50 hover:bg-stone-100 transition-all">
-                            <div class="flex flex-col items-center justify-center pt-5 pb-6 text-stone-400" id="uploadText">
-                                <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                <p class="text-[10px] uppercase font-bold tracking-widest">Allega Foto Reference</p>
-                            </div>
-                            <input id="foto" type="file" accept="image/*" class="hidden" onchange="updateFileName(this)" />
-                        </label>
-                        <p id="fileName" class="text-[10px] text-center text-sage-600 mt-2 font-bold"></p>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3 text-xs">
-                        <input type="text" id="pos" placeholder="Zona corpo" class="p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none focus:border-[#a3b18a]">
-                        <input type="text" id="mis" placeholder="Misure (cm)" class="p-4 bg-stone-50 border border-stone-100 rounded-xl outline-none focus:border-[#a3b18a]">
-                    </div>
-                </div>
-
-                <button type="submit" class="w-full py-5 bg-[#a3b18a] text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg hover:brightness-95 transition-all active:scale-[0.98]">
-                    Invia Richiesta su WhatsApp 🌿
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        function selectType(val) {
-            document.getElementById('tipoServizio').value = val;
-            const isPrev = val === 'Preventivo';
-            document.getElementById('btnPrev').classList.toggle('bg-white', isPrev);
-            document.getElementById('btnPrev').classList.toggle('shadow-sm', isPrev);
-            document.getElementById('btnBook').classList.toggle('bg-white', !isPrev);
-            document.getElementById('btnBook').classList.toggle('shadow-sm', !isPrev);
+        try {
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+                method: "POST",
+                body: formData
+            });
+            const data = await res.json();
+            imageUrl = data.secure_url;
+            document.getElementById('uploadText').innerText = "✅ Foto Caricata!";
+        } catch (err) {
+            alert("Errore nel caricamento foto. Riprova.");
+            document.getElementById('uploadText').innerText = "Errore. Riprova.";
         }
+    }
 
-        function updateFileName(input) {
-            const name = input.files[0] ? `✓ Immagine selezionata: ${input.files[0].name}` : "";
-            document.getElementById('fileName').innerText = name;
+    function updateFileName(input) {
+        if (input.files && input.files[0]) {
+            uploadImage(input.files[0]);
         }
+    }
 
-        document.getElementById('tattooForm').onsubmit = function(e) {
-            e.preventDefault();
-            
-            const numeroTatuatore = "393474184010"; // <--- CAMBIA CON IL TUO
+    document.getElementById('tattooForm').onsubmit = function(e) {
+        e.preventDefault();
+        
+        const numeroTatuatore = "393474184010"; // <--- IL TUO NUMERO
 
-            const tipo = document.getElementById('tipoServizio').value;
-            const nome = document.getElementById('nome').value;
-            const ig = document.getElementById('ig').value;
-            const idea = document.getElementById('idea').value;
-            const zona = document.getElementById('pos').value;
-            const misura = document.getElementById('mis').value;
-            const hasFoto = document.getElementById('foto').files[0] ? "ALLEGATA (Inviala ora dalla galleria)" : "Non allegata";
+        const tipo = document.getElementById('tipoServizio').value;
+        const nome = document.getElementById('nome').value;
+        const idea = document.getElementById('idea').value;
+        const fotoLink = imageUrl ? imageUrl : "Nessuna foto caricata";
 
-            const testo = `🌿 *SANGUE E LACRIME STUDIO*%0A` +
-                          `------------------------------%0A` +
-                          `🔥 *Tipo:* ${tipo}%0A` +
-                          `👤 *Cliente:* ${nome}%0A` +
-                          `📸 *IG:* ${ig}%0A` +
-                          `🎨 *Idea:* ${idea}%0A` +
-                          `📍 *Zona:* ${zona} (${misura})%0A` +
-                          `🖼️ *Foto:* ${hasFoto}%0A` +
-                          `------------------------------%0A` +
-                          `_Invio ora la foto dalla mia galleria..._`;
+        const testo = `🌿 *SANGUE E LACRIME STUDIO*%0A` +
+                      `------------------------------%0A` +
+                      `🔥 *Tipo:* ${tipo}%0A` +
+                      `👤 *Cliente:* ${nome}%0A` +
+                      `🎨 *Idea:* ${idea}%0A` +
+                      `🖼️ *Foto:* ${fotoLink}%0A` +
+                      `------------------------------`;
 
-            window.location.href = `https://api.whatsapp.com/send?phone=${numeroTatuatore}&text=${testo}`;
-        };
-    </script>
-</body>
-</html>
+        window.location.href = `https://api.whatsapp.com/send?phone=${numeroTatuatore}&text=${testo}`;
+    };
+</script>
